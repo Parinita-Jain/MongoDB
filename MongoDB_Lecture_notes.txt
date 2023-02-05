@@ -1,0 +1,877 @@
+MOngo DB is a dictionary based database.or a documnet based databse. It stores data in a document.It has rich query language.It key value pair to store the data.
+It is flexible with schematics and it is a NoSQL database.It doesnot have the restriction of traditional databases.It can store any data within itself of any length.It is scalable and can store vast amount of data.
+
+A database is a organized collection of data stored electronically . It helps in store,search update and deletion of data.
+
+No SQL stands for non SQl or not only sql relational databases. The schema is not fixed and diffeernt type of NOSQL databases exist like key value,document, white col
+and graph based. This also has the ability to distribute data which helps in hosting data in different geographical location.Ease of development.
+This also gives flexibility to avoid null values.
+
+CAP Theorem--The distributed systems encounter network failure problems. So how system chooses to encounter that problem need to be understand in detail--
+Suppose there is a distributed system of databases, and it stores some data, initially all nodes contain the same value, i.e. X=0 lets say.The client can read
+the code form any node and it will return the same result.But then the client updates the value. lets say--X=1. The other node will copy the changes made.
+Now,lets say client updates the value to X=2. And before the other node can update, network failure occurs between two nodes.. NOw one node has x=2 and other x=1.
+So case 1 is - inconsisitent data, but available for use, 2 - not available for use but after gets available gives consisitent info. this problem of distributed system 
+choosing between problem 1 or 2 is addressed by CAP theorem--Consisitency,Availability and Partition Tolerance. Partition Tolerance is the ability of system to work
+despite partition.When the partiion occurs, the system either provides consisitency or availability. Consisitency means all the nodes in the distributed system
+will always return most recent state. And the outdate node will wait for the problem to be fixed before processing any request. Availability means every node can
+process requests at any given point of time. The CAP theorem says that a distributed system can only have 2 out of these 3 properties at any given point of time.
+
+  
+Mongo DB Database-- rows,tables,database in RDBMS-- documents,Collections,database in MONGODB,respectively
+
+MongoDB document is like JSON document.It represent and transfer data efficiently.It is internally stored as BSON i.e. binary JSON.BSON document encodes a length,
+datatype,field name, field value,. This is the internal representation.
+But when we view documents in MONGODB, it is viewd in language specific format, i.e. if u view in python, it is viewed as dictionary.If java script, then as java script object.
+
+Components of MOngoDB Documents--fields or keys-- these are in string format. Then we have values-- that corresponds to keys.these can be string,numeric or date
+or array or even document,or sub-document which can contain any datatyep. The first field is underscore id field, which is the primary key to uniquely identify 
+documents in a collection.
+
+It has nomenclature restrictions like avoid using dot,dollar. It is type sensitive,case sensitive.
+
+Collections --this contains multiple documents and is similar to tables in RDBMS.They hav a flexible schema.Each document within a collection can have a different 
+schema.
+
+Database - collection of collections.3 reserved databses in MOngoDB are--admin,local and config. Admin is the root database.local contains databses local to the
+current MongoDB server.config database contains info about sharded cluster.
+
+MOngoDB storage format-- BSON
+
+Download mongodb--
+
+MongoDB--to connect to databses on mongodb and implement queries on it, we need to first establish a connection between a client and the mongo db, and for that 
+we need to run the mongod process on the mongodb whole system. Mongo D is the primary daemon process for MongoDB and daemon is a process that runs in background.
+and it is not meant to be run interactively. MongoD handles all the data requests. Manages the data access and performs background mgmt operations.
+It is present in every mongoDB server.We can access mongoD from mongoDB shell,mongoDB compass or even programming drivers like python,java etc.
+
+
+mongo.exe is not present in bin-- so download mongoshell--https://stackoverflow.com/questions/73081708/mongo-exe-not-installed-in-version-6-0-0  -------
+extract everything into bin folder--there is mongod application-- run that-- then run mongosh application---
+Please enter a MongoDB connection string (Default: mongodb://localhost/):  mongodb://localhost/ ---------------on mongo shell---
+
+test> -----------mongoshell started.
+
+mongoDB Atlas--it allows user to host database on cloud like AWS ,google cloud,azure. It provides free tier cluster with 512MB storage
+
+Setting up a cluster on mongodb atlas--
+
+username--Parinita-Jain
+pwd - Silver@19
+
+Cloud Provider & Region
+AWS, Mumbai (ap-south-1)
+
+Cluster Tier
+M0 Sandbox (Shared RAM, 512 MB Storage)
+
+creating databases and collections in mongoDB---listing databases and collections, can a db can have multiple collection with same name?--
+
+test> show dbs 
+admin    40.00 KiB
+config  108.00 KiB
+local    40.00 KiB
+
+b. Switching to an existing database or creating a new database.
+i. If a database exists, it will be reflected.
+ii. If a database does not exist, it will still be reflected. Although the
+database has not been created yet.
+iii. Syntax
+use <db_name>
+
+> use local
+switched to db local
+
+creating a new database demo in local server--
+
+local>use demo
+switched to db demo
+
+
+------the demo db is not yet created. We can verify this by doing show dbs
+demo> show dbs
+admin    40.00 KiB
+config  108.00 KiB
+local    40.00 KiB
+
+This is because mongodb doesnot create a db until we insert atleast 1 document in the db.
+
+c. Creating a new database.
+i. To create a new database, a document needs to be inserted in it.
+ii. Provide the collection to which document will be inserted. The
+collection will be created implicitly along with the database.
+iii. Use the insertOne() method to insert a document.
+iv. Syntax
+db.<collection_name>.insertOne(<document>)
+v. Example
+db.user.insertOne({emp_id: 1, name: "Alice"})--------so
+
+
+
+demo> db.user.insertOne({emp_id:1,name:"Alice"})----------------- db is the object that refers to current db which is demo, name of collection--user
+{
+  acknowledged: true,
+  insertedId: ObjectId("63cce9a49aa59a4352cf6472")
+}
+
+and after this -- even demo db is created. so----
+
+demo> show dbs
+admin    40.00 KiB
+config  108.00 KiB
+demo     40.00 KiB
+local    40.00 KiB
+
+demo> db---------------------- gives current database
+demo
+
+demo> show collections-------------lists all the collections within demo database
+user
+
+2. Collections
+a. Listing collections within a database.
+i. Syntax
+show collections
+b. Creating a new collection.
+i. A collection is implicitly created while creating a database.
+ii. Explicitly a new collection can be created using createCollection()
+method.
+iii. Syntax
+db.createCollection(“<collection_name>”)
+iv. Example
+db.createCollection(“dept”)
+
+
+demo> db.createCollection("dept")------------------------collection dept created
+{ ok: 1 }
+
+demo> show collections
+dept
+user
+
+now dept doesnot have any document now, but still its not an issue.
+
+demo> db.createCollection("dept")------------------------------------- we cannot have collection with same name
+MongoServerError: Collection demo.dept already exists.
+
+-------------inserting documents------
+Inserting Documents
+1. Inserting a single document.
+a. A single document can be inserted in a collection using insertOne()
+function.
+i. Syntax
+db.<collection>.insertOne(<document>)
+ii. Example
+db.user.insertOne({emp_id: 2, name: "Bob"})
+
+
+demo> db.user.insertOne({emp_id:2,name:"Bob"})
+{
+  acknowledged: true,
+  insertedId: ObjectId("63ccec1f9aa59a4352cf6473")
+}
+
+
+b. A single document in a collection can also be inserted using the insert()
+function.
+i. Syntax
+db.<collection>.insert(<document>)
+ii. Example
+db.user.insert({emp_id: 2, name: "Bob"})
+2. Inserting multiple documents.
+a. Multiple documents can be inserted in a collection using insertMany()
+function.
+i. Syntax
+db.<collection>.insertMany([<document>, <document>, ...)
+ii. Example
+db.user.insertMany([{emp_id:3, name:"Raj"}, {emp_id:4,
+name:"Irfan"}])
+
+demo> db.user.insertMany([{emp_id:3,name:"Raj"},{emp_id:4,name:"Irfan"}])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId("63cced149aa59a4352cf6474"),
+    '1': ObjectId("63cced149aa59a4352cf6475")
+  }
+}
+
+b. Multiple documents can also be inserted in a collection using insert()----------- lets us insert single or multiple documents
+function.
+i. Syntax
+db.<collection>.insert([<document>, <document>, ...)
+
+
+
+demo> db.user.insert({emp_id:5})------------------------------------------------------------------
+DeprecationWarning: Collection.insert() is deprecated. Use insertOne, insertMany, or bulkWrite.
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId("63cced709aa59a4352cf6476") }
+}
+
+ii. Example
+db.user.insert([{emp_id:3, name:"Raj"}, {emp_id:4, name:"Irfan"}])
+
+
+demo> db.user.insert([{emp_id:5,name:"Sasha"},{emp_id:6,name:"Raya"}])----------------
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId("63ccedf29aa59a4352cf6477"),
+    '1': ObjectId("63ccedf29aa59a4352cf6478")
+  }
+}
+
+*------------------------reading documents------------------------
+
+Reading Documents
+1. Reading all documents in a collection.
+a. All documents in a collection can be read using the find() function.
+i. Syntax
+db.<collection_name>.find()
+
+demo> db.user.find()--------------------------------------------------------------------
+[
+  {
+    _id: ObjectId("63cce9a49aa59a4352cf6472"),
+    emp_id: 1,
+    name: 'Alice'
+  },
+  { _id: ObjectId("63ccec1f9aa59a4352cf6473"), emp_id: 2, name: 'Bob' },
+  { _id: ObjectId("63cced149aa59a4352cf6474"), emp_id: 3, name: 'Raj' },
+  {
+    _id: ObjectId("63cced149aa59a4352cf6475"),
+    emp_id: 4,
+    name: 'Irfan'
+  },
+  { _id: ObjectId("63cced709aa59a4352cf6476"), emp_id: 5 },
+  {
+    _id: ObjectId("63ccedf29aa59a4352cf6477"),
+    emp_id: 5,
+    name: 'Sasha'
+  },
+  {
+    _id: ObjectId("63ccedf29aa59a4352cf6478"),
+    emp_id: 6,
+    name: 'Raya'
+  }
+]
+
+
+ii. Example
+db.user.find()
+b. Read all documents in a collection that match a provided query.
+i. Syntax
+db.<collection_name>.find(<query_expression>)
+
+demo> db.user.find({emp_id:5})------------------------------------------------------
+[
+  { _id: ObjectId("63cced709aa59a4352cf6476"), emp_id: 5 },
+  {
+    _id: ObjectId("63ccedf29aa59a4352cf6477"),
+    emp_id: 5,
+    name: 'Sasha'
+  }
+]
+
+
+demo> db.user.find({emp_id:5,name:"Sasha"}).pretty()--------------------------------------
+[
+  {
+    _id: ObjectId("63ccedf29aa59a4352cf6477"),
+    emp_id: 5,
+    name: 'Sasha'
+  }
+]
+
+ii. Example
+db.user.find({name:”Raj”})
+c. Print documents in a more comprehensive manner using pretty() function.
+i. Syntax
+db.<collection>.find(<query_expression>).pretty()
+ii. Example
+db.user.find({name:”Raj”}).pretty()
+2. Reading a single document in a collection.
+a. Read a single document from a collection using findOne() function.
+b. Returns the first document according to the order in which the records are
+in the disk.
+i. Syntax
+db.<collection_name>.findOne()
+ii. Example
+db.user.findOne()
+
+demo> db.user.findOne()-----------------------------------------------------------------------------
+{ _id: ObjectId("63cce9a49aa59a4352cf6472"), emp_id: 1, name: 'Alice' }
+
+c. Read a single document out of all documents that matches a provided
+condition.
+i. Syntax
+db.<collection_name>.findOne(<query_expression>)
+
+demo> db.user.findOne({emp_id:5})-----------------------------------------------------------------------
+{ _id: ObjectId("63cced709aa59a4352cf6476"), emp_id: 5 }
+ii. Example
+db.user.findOne({emp_id:1, name:”Alice”})
+
+demo> db.user.findOne({emp_id:5,name:"Alice"})------------------------------------------
+null
+demo> db.user.findOne({emp_id:1,name:"Alice"})-----------------------------------------------
+{ _id: ObjectId("63cce9a49aa59a4352cf6472"), emp_id: 1, name: 'Alice' }
+d. The pretty() function does not work with findOne().
+
+-----------------------------_id field--------------------------------------
+
+The _id field
+1. _id field
+a. It is a primary key.
+b. It uniquely identifies documents in a collection.
+c. It is either provided in a document. If it is not provided, it is automatically
+created by MongoDB.
+d. No two documents within a collection can have the same _id field value.
+2. Inserting document with _id field.
+a. While inserting a document in a collection, a unique _id field value can be
+provided.
+b. Syntax
+db.<collection>.insert({_id: <unique_value>, ...})
+c. Example
+db.dep.insert({_id:1, name: "Finance", location: "Mumbai"})
+
+demo> show collections
+dept
+user
+demo> db.dept.insert({name:"Marketing",location:"Delhi"})--------------------------------------------------
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId("63ccf24e9aa59a4352cf6479") }
+}
+demo> db.dept.find()--------------------------------------------------------------------------------------
+[
+  {
+    _id: ObjectId("63ccf24e9aa59a4352cf6479"),
+    name: 'Marketing',
+    location: 'Delhi'
+  }
+]
+
+3. Inserting document without _id field.
+a. If _id field is not provided, then MongoDB automatically creates one.
+b. Syntax
+db.<collection>.insert(<document>)
+c. Example
+db.dep.insert({name:'Marketing', location:'Delhi'})
+
+demo> db.dept.insert({name:"Marketing",location:"Delhi"})----------------------------duplicate documents can be created since they have diff id values
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId("63ccf2b89aa59a4352cf647a") }
+}
+d. The _id field value created by MongoDB is unique and is of ObjectId type.
+i. ObjectId is a BSON type that represents a hexadecimal string.
+ii. ObjectId contains a timestamp value, a random value, and an
+incrementing counter value to uniquely identify a document.
+
+demo> db.dept.insert({_id:1,name:"Finance",location:"Mumbai"})----------------------------------giving _id field
+{ acknowledged: true, insertedIds: { '0': 1 } }
+
+demo> db.dept.find()-------------------------------------------------------------------------------
+[
+  {
+    _id: ObjectId("63ccf24e9aa59a4352cf6479"),
+    name: 'Marketing',
+    location: 'Delhi'
+  },
+  {
+    _id: ObjectId("63ccf2b89aa59a4352cf647a"),
+    name: 'Marketing',
+    location: 'Delhi'
+  },
+  { _id: 1, name: 'Finance', location: 'Mumbai' }
+]
+
+
+demo> db.dept.insert({_id:2,name:"Sales",location:"Mumbai"}----------------------------------
+
+demo> db.dept.insert({_id:2,name:"Sales",location:"Mumbai"},{_id:2,name:"Operations",location:"Delhi"},{_id:3,name:"HR",location:"Mumbai"})----------------------
+MongoBulkWriteError: E11000 duplicate key error collection: demo.dept index: _id_ dup key: { _id: 2 }-----------error and dpesnot insert any record after error--
+
+4. Document insertion order.
+a. Documents are by default inserted in an ordered manner.
+i. Example
+db.dep.insert([{_id:2, name:"Sales", location:"Mumbai"},
+{_id:3, name:"Operations", location:"Delhi"},
+{_id:4, name:"HR", location:"Mumbai"}])
+b. Documents can be inserted in an unordered manner using the ordered
+option.
+i. Example
+db.dep.insert([{_id:2, name:"Sales", location:"Mumbai"},
+{_id:3, name:"Operations", location:"Delhi"},
+{_id:4, name:"HR", location:"Mumbai"}],
+{ordered:false})
+
+
+Importing and Exporting Data
+1. Importing Data
+a. Importing or exporting of any data needs to be done from outside the
+mongo shell.
+b. It can be performed using mongoimport command.
+c. We can import from JSON or CSV or TSV.
+d. If a database or collection does not exist while importing data, these will
+be created automatically.
+e. If a collection exists in the database, the data will be appended to the
+existing collection.
+f. Syntax for Importing for JSON----------------------------------------------------------
+mongoimport --db <database_name> --collection
+<collection_name> --file <file_path> --jsonArray
+g. Example
+mongoimport --db school --collection students --file  
+/home/avadmin/Desktop/Mongo/crud/demo_data.json --jsonArray ------------------------using --db object name of db is provided, it can be new or old db
+
+----------------I uploaded using mongodb compass----------------
+
+demo>use local
+
+
+local> show dbs
+admin    40.00 KiB
+config  108.00 KiB
+demo    144.00 KiB
+local    48.00 KiB
+local> show collections
+startup_log
+students
+
+local> db.students.findOne()
+{
+  _id: ObjectId("63cd015378dcf628c1687785"),
+  name: 'Ramon',
+  age: 14,
+  class: 8,
+  state: 'Kansas'
+}
+
+
+h. Syntax for Importing CSV file.
+mongoimport --db <database_name> --collection
+<collection_name> --type <json|csv|tsv> --headerline --file
+<file_path>
+i. Mention type as CSV. By default it is JSON.
+ii. Need to mention header line option to include first line of CSV file
+as field names.
+i. Example
+mongoimport --db school --collection students_csv --type csv
+--headerline --file
+/home/avadmin/Desktop/Mongo/crud/demo_csv.csv
+
+
+#-----------------------------------imported csv file through compass---------------------then---
+
+
+
+local> use school
+switched to db school
+school> db.students_csv.findOne()
+{
+  _id: ObjectId("63cd038878dcf628c1687b6e"),
+  name: 'Ramon',
+  age: '14',
+  class: '8',
+  state: 'Kansas'
+}
+
+
+
+
+2. Exporting Data----------------------------------lets us export data from mongodb into an external file.eg json ,csv or tsv file
+a. Exporting to JSON.
+i. It can be performed using mongoexport command.
+ii. Syntax
+mongoexport --db <database_name> --collection
+<collection_name> --out <file_path>
+iii. Examplemongoexport --db school --collection students --out
+'/home/avadmin/Desktop/Mongo/crud/data_export.json'----------------------------------------------done through compass---demo_data_export.json
+b. Export CSV file.
+i. Syntax
+mongoexport --db <dataabse_name> --collection
+<collection_name> --type csv --fields=<fields> --out
+<file_path>
+ii. Need to mention the type of file as CSV.
+iii. Need to provide the field names to be used in the CSV file.
+iv. Example
+mongoexport --db school --collection students_csv --type
+csv --fields=name,age,class,state --out
+'/home/avadmin/Desktop/Mongo/crud/data_export_csv.csv'----------------------------done through compass students_csv_data_export.csv
+
+#-----------------------------Backup and Restore MongoDB database---------------------
+
+taking binary backup of mongodb database and restoring it onto a mongodb server----
+
+Backup and Restore MongoDB Databases
+1. Taking Backup of Database
+a. Take backup of database using mongodump command.
+b. If no database name is specified, all databases will be backed up.
+c. If no collection name is specified while backing up a specific database, all
+collections within that database will be backed up.
+d. Syntax
+mongodump --db <database_name> --collection <collection_name>
+--out <file_path>
+e. Example
+mongodump --db school --collection students --out
+/home/avadmin/Desktop/school
+2. Restoring from Backup DataBase
+a. Restore database backup using mongorestore command.
+b. Syntax
+Mongorestore --db <database_name> --collection
+<collection_name> <file_path>Example
+c. Example:
+mongorestore --db demoDB --collection students
+/home/avadmin/Desktop/
+
+
+#-----------------------updating documnets------------------
+
+
+school> db.students_csv.find({class:'8'}).count()---------------------------------------------------------------
+197
+school> db.students_csv.find({class:'9'}).count()------------------------------------------------------------------
+201
+
+Updating Documents
+1. Updating a single document.
+a. A single document can be updated using updateOne() function.
+b. Syntax
+db.<collection_name>.updateOne(<query_expression>,
+<update_expression>)
+c. Example
+db.students.updateOne({name: 'Jori'}, {$set :{class: 9}})
+2. Updating multiple documents.
+a. Multiple documents can be updated using updateMany() function.
+b. Syntax
+db.<collection_name>.updateMany(<query_expression>,
+<update_expression>)
+c. Example
+db.students.updateMany({class: 8}, {$set: {class: 9}})
+
+school> db.students_csv.updateOne({class:'8'},{$set:{class : '9'}})----------------------------------------------
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+school> db.students_csv.find({class:'9'}).count()---------------------------------------------------
+202
+
+
+3. Update operators.
+a. There are multiple update operators to update documents in a collection.
+b. $set - Sets value of document(s) field to the one provided in the
+expression. Or include a new field in the document(s) if it does not exist.
+i. Syntax
+db.<collection>.updateOne({<query_expression>}, {$set: {<field>:
+<value>}})
+Or
+db.<collection>.updateMany({<query_expression>}, {$set: {<field>:
+<value>}})
+ii. Example
+db.students.updateMany({}, {$set: {class: 9}})
+
+school> db.students_csv.updateMany({class:'8'},{$set:{class : '9'}})-------------------------------------------------
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 196,
+  modifiedCount: 196,
+  upsertedCount: 0
+}
+school> db.students_csv.find({class:'9'}).count()------------------------------------
+398
+school> db.students_csv.find({class:'8'}).count()----------------------------------
+0
+c. $inc - Increments value of document(s) field by value provided in the
+expression.
+i. Syntax
+db.<collection>.updateOne({<query_expression>}, {$inc: {<field>:
+<increment>}})
+Or
+db.<collection>.updateMany({<query_expression>}, {$inc: {<field>:
+<increment>}})
+ii. Example
+
+--------------incrementing so that where ever value is class 9 gets incremented to 10
+
+db.students.updateMany({}, {$inc: {class: 1}})
+d. $rename - Rename a field name to the one provided.
+i. Syntax
+db.<collection>.updateOne({<query_expression>}, {$rename: {<field>:
+<newName>}})
+Or
+db.<collection>.updateMany({<query_expression>}, {$rename:
+{<field>: <newName>}})
+ii. Example
+db.students.updateMany({}, {$rename: {"name":
+"firstname"}})
+
+school> db.students_csv.updateMany({},{$rename:{"name":"firstname"}})-------------------------------------------
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1000,
+  modifiedCount: 1000,
+  upsertedCount: 0
+}
+school> db.students_csv.findOne()
+{
+  _id: ObjectId("63cd038878dcf628c1687b6e"),
+  age: '14',
+  class: '9',
+  state: 'Kansas',
+  firstname: 'Ramon'
+}
+
+e. Complete list of update operators -
+https://docs.mongodb.com/manual/reference/operator/update-field/
+4. Update multiple fields together.
+a. Multiple fields in document(s) can be updated together by providing
+update operators in a comma separated format.
+i. Syntax
+db.<collection>.updateOne({<query_expression>},
+{<operator>, <operator>, ...})
+Or
+db.<collection>.updateMany({<query_expression>},
+{<operator>, <operator>, ...})
+ii. Example
+db.students.updateMany({}, {$inc: {age:1},
+$set:{country:'USA'}})
+
+
+school> db.students_csv.updateMany({},{$set: {country:"USA"}})---------------------------------------
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1000,
+  modifiedCount: 1000,
+  upsertedCount: 0
+}
+school> db.students_csv.findOne()------------------------------------------------------
+{
+  _id: ObjectId("63cd038878dcf628c1687b6e"),
+  age: '14',
+  class: '9',
+  state: 'Kansas',
+  firstname: 'Ramon',
+  country: 'USA'
+}
+
+#------------------------------------------------
+
+Deleting Documents, Collections and Databases
+1. Deleting field(s) within a document
+a. Delete field(s) within a document using $unset update operator.
+i. Syntax
+db.<collection>.updateMany({query_expression}, {$unset:
+{<fieldname>: ‘’ }})
+ii. Example
+db.students.updateMany({}, {$unset: {country:''}})
+
+school> db.students_csv.updateMany({},{$unset: {country:""}})--------------------------first {} is for filter condition
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1000,
+  modifiedCount: 1000,
+  upsertedCount: 0
+}
+school> db.students_csv.findOne()
+{
+  _id: ObjectId("63cd038878dcf628c1687b6e"),
+  age: '14',
+  class: '9',
+  state: 'Kansas',
+  firstname: 'Ramon'
+}
+school> db.students_csv.deleteOne({firstname:'Adelina'})
+{ acknowledged: true, deletedCount: 1 }
+
+2. Deleting document(s)
+a. Delete a document using deleteOne() function.
+i. Syntax
+db.<collection>.deleteOne({query_expression})
+ii. Example
+db.students.deleteOne({firstname: ’Jori’})
+
+
+school> db.students_csv.deleteOne({firstname:'Adelina'})----------------------
+{ acknowledged: true, deletedCount: 1 }
+school> db.students_csv.find({firstname:'Adelina'})-------------------
+
+school> db.students_csv.find({class:'10'}).count()---------------------
+210
+school> db.students_csv.deleteMany({class:'10'})----------------------
+{ acknowledged: true, deletedCount: 210 }
+school> db.students_csv.find({class:'10'}).count()----------------
+0
+school> show collections------------
+students_csv
+school> db.students.drop()-----------------
+false
+school> db-----------------
+school
+school> db.dropDatabase()-------------------------
+{ ok: 1, dropped: 'school' }
+school> show dbs-------------------------------------
+admin    40.00 KiB
+config  108.00 KiB
+demo    144.00 KiB
+local   108.00 KiB
+
+b. Delete multiple documents using deleteMany() function.
+i. Syntax
+db.<collection>.deleteMany({query_expression})
+ii. Example
+db.students.deleteMany({class: 9})
+3. Deleting collection
+a. Delete a collection using drop() function.
+i. Syntax
+db.<collection>.drop()
+ii. Example
+db.students.drop()
+4. Deleting database
+a. Delete a database using dropDatabase() function.
+b. Remember to first check the database in use using db command.
+i. Syntax
+db.dropDatabase()
+
+#___________________________________CRUD operation in MongoDB Atlas---------------------------------
+
+working in MongoDB Cluster Atlas-----------------------which is the cloud database servdr provided my mongodb
+
+https://cloud.mongodb.com/v2/63ccde60f7146f5ba4698bc4#/clusters
+
+we have 3 options---------------Connect,View Monitoring,Browse Collections . Apart from that we have 3 dots--load sample dataset-- automatically load default 
+dataset into cluster.
+
+click on collections and we will have all the sample datasets--once its loaded --- browse collections--- sample restaurant data------------restaurants---
+it has about 25000 documents.
+
+lets say we want to look for that restaurant where cuisine is indian--just type in filter condition---{cuisine:"Indian"}
+for insertion-- click on insert document--This is about working with Atlas Cluster.
+
+Importing exporting data to and from Atlas Cluster---cluster 0---overview--- connect----connect with the mongo shell--I donot have mongoDB shell---copy url
+add all mongod,mongos,mongosh in environment variable
+then goto bin folder and run cmd prompt---
+
+
+C:\Program Files\MongoDB\Server\6.0\bin>mongosh "mongodb+srv://cluster0.kk9aans.mongodb.net/myFirstDatabase" --apiVersion 1 --username Parinita-Jain
+Enter password: ----put pwd----
+
+
+Atlas atlas-i6yjvi-shard-0 [primary] myFirstDatabase> use sample_analytics
+switched to db sample_analytics
+Atlas atlas-i6yjvi-shard-0 [primary] sample_analytics> show collections
+accounts
+customers
+transactions
+
+Now, going back to atlas cluster---importing and exporting---- 
+
+first download mongodb database tools from official website and extract everything into bin. Then from bin directory start cmd line---
+
+click on 3 dots---importing external json file into atlas cluster----from mongo import copy everything--
+
+C:\Program Files\MongoDB\Server\6.0\bin>mongoimport --uri mongodb+srv://Parinita-Jain:@cluster0.kk9aans.mongodb.net/atlas_demo --collection students --type json --jsonArray --file C:\Users\parin\Documents\AV\MongoDB\CRUD_Data\demo_data.json
+Enter password for mongo user:
+
+2023-01-23T09:32:08.946+0530    connected to: mongodb+srv://[**REDACTED**]@cluster0.kk9aans.mongodb.net/atlas_demo
+2023-01-23T09:32:11.947+0530    [########################] atlas_demo.students  56.8KB/56.8KB (100.0%)
+2023-01-23T09:32:12.079+0530    [########################] atlas_demo.students  56.8KB/56.8KB (100.0%)
+2023-01-23T09:32:12.080+0530    1000 document(s) imported successfully. 0 document(s) failed to import.
+
+Now go back to atlas clusters-- collections--atlas_demo with students is there---
+
+Now, exporting db from atlas into local server---
+
+click on 3 dots---importing external json file into atlas cluster----from mongo export copy everything--
+
+C:\Program Files\MongoDB\Server\6.0\bin>mongodump --uri mongodb+srv://Parinita-Jain:@cluster0.kk9aans.mongodb.net --out C:\Users\parin\Documents\AV\MongoDB\Atlas_DB
+Enter password for mongo user:
+
+After that
+C:\Program Files\MongoDB\Server\6.0\bin>mongorestore C:\Users\parin\Documents\AV\MongoDB\Atlas_DB------------now all the databases taht we have dumped will now be restored to the local mongodb server.
+
+goto mongosh 
+
+>show dbs
+
+admin                40.00 KiB
+atlas_demo           68.00 KiB
+config              108.00 KiB
+demo                144.00 KiB
+local               108.00 KiB
+sample_airbnb        52.45 MiB
+sample_analytics      9.50 MiB
+sample_geospatial     1.06 MiB
+sample_guides        40.00 KiB
+sample_mflix         45.55 MiB
+sample_restaurants    5.97 MiB
+sample_supplies     968.00 KiB
+sample_training      42.98 MiB
+sample_weatherdata    2.39 MiB
+
+--------------------------PyMongo---------------------------------module5-------------
+C:\Users\parin>pip install pymongo
+
+Connecting to atlas cluster using pymongo-----or connecting mongodb server using jupyter notebook
+
+Connecting to Atlas Cluster Using pymongo.ipynb
+
+goto atlas cluster dashboard for connection string--connect----connect your application---its node.js by default-- select python--ver 3.6 above---copy string--see the file---
+following changes are done---
+
+import urllib
+client = pymongo.MongoClient('mongodb+srv://Parinita-Jain:'+urllib.parse.quote_plus("Silver@19")+'@cluster0.kk9aans.mongodb.net/?retryWrites=true&w=majority')
+
+-----connecting to local MongoDb server using Pymongo.ipynb
+
+-----Querying Using COmparison Operator.ipynb----
+
+instead of count() use len(list(cursor object))
+
+
+#---------------------------module 6----------------------------------------------
+
+C:\Users\parin>mongorestore --db training C:\Users\parin\Documents\AV\MongoDB\Course Handouts\Module 6 - Building Pipelines in MongoDB\training
+
+Using aggregation pipeline------aggregation pipeline is a series of steps sequentially to get the final result.It can contain filtering,transforming or even sorting
+steps.
+
+#--------------------module 7--------------------------------------
+
+indexing in mongodb----an index is created on a collection that keeps a reference to the documents in the collection.It stores values of a field from a document.
+The field on which the index is created is known as index key.These index keys are stored in the ordered manner and they refer to the doc that contain that 
+particular index.Hence, mongoD first refers to these indexes and then to the documents.By default index is created on _id field.But we can create on some other field
+too. Types of indexes-- single field,compound index,multi-key index is created on an array field.Text index on text fields and allow us to perform text search queries.
+Geospatial index. The challenges with indexes are--storage,for any insertion deletion or updation of doc-index also needs to be updated. Index keys are stored in either asce or desc order.
+
+----------indexing in mongodb---
+
+
+#------------------ replication and sharding--------------------------------
+
+In replication we have more than 1 server and we store each piece of info on more than 1 server..In mongo db replication takes place through replica set where
+replica set is a group of servers that maintain the same dataset. In a replica set, they have 1 primary server and many secondry servers and these servers can 
+be located anywhere in the world and the client connects to the nearby server and read the data.Thus, replicate offers fault tolerance, data locality,increased read
+capacity. The role of the primary server is to perform read and write operation. while secondary servers can only perform read operation.Each of these servers run
+a seperate mongodb process.Each of these servers keep a track of each other status for a short message which is called heartbeat. This is done every 2secs by default.
+Suppose primary doesnot respond to the heart beat then it could be that the primary server has been gone down. Now the secondaries have to elect the new primary.
+and secondaries do this by voting.This is called replica set election.And when the failed node recovers , it joins back the replica set.The erplication protocol in mogodb is asynchronous i.e. data is not replicated simultaneously as soon as it is been recorded in the primary. Tf the primary maintains a record of all the operations that are performed in the data in a special collection, and that collection is called oplog. This is stored in a local db in a mongodb server.Now whenever secondaries connect primaries for updating their data, they simply copy this oplog from primary and implement this same operations on their data
+
+Sharding--in mongodb is horizontally scling the database.Suppose the data in our mongodb server keeps on increasing.Even if we maintain a replica set for the databse,all the servers will contain the same dataset. And so all of them will require greater ram,disc and cpu to store and process the increasing amount of data.
+So, instead of maintaining all the data on a single server, the subset of data is stored on different servers.And this distribution of data across various servers in a cluster is called sharding.Each server here is known as a shard.Sharding gives benefit of increased storage and processing capacity provided through horizontal scaling.Second benefit is distributed read/write operations across the sharded cluster.
+
+Sharding in mongodb--Consider a sharded cluster that has 2 shards--The dataset here is going to be distributed among these shards. This can be done based on range of values in any chosen fields from docs.For eg age-- one shard contains data from 10-30,other 10-60. Now when the client sends a query,the query gets routed to the appropriate shard and the result is return. For this routing we have mongos--mongos is an instance that provides the between the client and the sharded cluster.It acts as a query router.Any query sent by the client is sent to a mongos. Mongos routes the query to the appropriate shard and returns the result. We can even have multiple mongos instances which allows mongodb to create more than 1 application client at once.Mongos actually caches the metadata about the sharded cluster,which helps to locate the data in the sharded cluster, where this metadata is actually stored in the config server.This metadata has complete info about the state of the shards where a subset of data is stored in the cluster.This metadata is stored in a config server.This config server can have its own replica set to improve the availability of this metadata.
+
+
+
+MongoDB.ipynb----
