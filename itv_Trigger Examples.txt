@@ -1,0 +1,29 @@
+create table student(
+sid int primary key auto_increment,
+sname varchar(20) not null,
+marks double);
+
+drop table audit;
+
+create table audit(
+tablename varchar(20),
+action varchar(20),
+actiondate datetime);
+
+drop trigger before_student_insert;
+
+delimiter //
+
+create trigger before_student_insert
+before insert
+on student
+for each row
+begin
+insert into audit values('student','insert',now());
+end //
+
+insert into student(sname,marks) values('scott',78.45);
+
+select * from student;
+
+select * from audit;

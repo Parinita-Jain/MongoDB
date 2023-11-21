@@ -1,0 +1,146 @@
+#Write a procedure to fill the employee_names table
+#with the data from the employees table. The name should 
+#concatenated and then saved in the employee_name table
+
+delimiter //
+
+create procedure employeeNameCursor()
+begin
+declare empid int;
+declare fname varchar(20);
+declare lname varchar(20);
+
+#declare the cursor
+declare cur cursor for 
+select employeenumber, firstname, lastname 
+from employees;
+
+#open cursor
+open cur;
+
+#fetch the rows and put the values of each rows in
+#the variable
+
+fetch cur into empid, fname, lname; #read the first row
+insert into employee_names 
+values(empid, concat(fname,' ',lname));
+
+fetch cur into empid, fname, lname; #read the second row
+insert into employee_names 
+values(empid, concat(fname,' ',lname));
+
+fetch cur into empid, fname, lname; #read the third row
+insert into employee_names 
+values(empid, concat(fname,' ',lname));
+
+#close cursor
+close cur;
+end //
+
+delimiter ;
+
+call employeeNameCursor();
+
+drop procedure employeeNameCursor;
+
+select * from employee_names;
+
+#####################################
+use sample;
+
+drop procedure employeeNameCursor;
+
+truncate table employee_names;
+
+delimiter //
+
+create procedure employeeNameCursor()
+begin
+declare done boolean default FALSE;
+declare empid int;
+declare fname varchar(20);
+declare lname varchar(20);
+declare cur cursor for 
+select employeenumber, firstname, lastname 
+from employees
+where officecode = 1;
+
+#In this statement we are just declaring what is to be done
+#if the error comes
+#This is error handling for the rows not found while
+#performing the fetch statement, if no rows are fetched
+#then we are saying in this statement that set the value 
+#of the done variable to TRUE
+declare continue handler for not found set done = TRUE;
+
+open cur;
+
+read_loop: loop
+	fetch cur into empid, fname, lname; 
+    if done then
+		leave read_loop; #we will leave the loop
+	end if;
+	insert into employee_names 
+	values(empid, concat(fname,' ',lname));    
+end loop;
+
+close cur;
+end //
+
+delimiter ;
+
+call employeeNameCursor();
+
+select * from employee_names;
+
+##############################
+
+select productline, avg(buyprice)
+from products
+group by productline;
+
+#Write a procedure to declare the cursor and fill it with
+#the data using following query:
+#select productline, avg(buyprice)
+#from products
+#group by productline;
+#Then fetch the records from the cursor and for each row
+#add the data in the a string variable in the format:
+#Classic Cars: $903794, ....
+#Then display this string variable value as the message as 
+#the result of the procedure
+
+delimiter //
+
+create procedure productlinemsg()
+begin
+
+declare done boolean default FALSE;
+declare pline varchar(50);
+declare pavg double;
+declare output varchar(200) default '';
+
+declare prodline cursor for
+select productline, avg(buyprice)
+from products
+group by productline;
+
+declare continue handler for not found set done = TRUE;
+
+open prodline;
+
+while not done do
+	fetch prodline into pline, pavg;
+    set output = concat(output,' ',pline,': $',pavg);
+end while;
+close prodline;
+
+select output 'Message';
+
+end //
+
+delimiter ;
+
+call productlinemsg();
+
+drop procedure productlinemsg;

@@ -1,0 +1,327 @@
+use sample;
+
+#Write a query to display the name of city in which the employees work
+
+select firstname, city
+from employees join offices
+on(employees.officecode = offices.officecode);
+
+select firstname, city
+from employees e join offices o
+on(e.officecode = o.officecode);
+
+select firstname, city
+from employees join offices
+using (officecode);
+
+#Write a query to display the name of the products whose 
+#order quantity more than 40
+
+#orderdetails & product
+
+select ordernumber, productname, quantityordered
+from orderdetails join products
+using (productcode)
+where quantityordered > 50;
+
+#Write a query to find all the employees working in the 
+#same city as that of William. Display firstname and working 
+#city of each employee
+
+select firstname, city
+from employees join offices
+using (officecode)
+where employees.officecode = 
+(select officecode
+from employees
+where firstname='william');
+
+
+delimiter //
+
+create procedure getAllEmps()
+begin
+select * from employees;
+end //
+
+delimiter ;
+
+call getAllEmps();
+
+delimiter //
+
+create procedure getEmpCity(ename varchar(20))
+begin
+select firstname, city
+from employees join offices
+using (officecode)
+where employees.officecode = 
+(select officecode
+from employees
+where firstname = ename);
+end //
+
+delimiter ;
+
+call getEmpCity('steve');
+
+delimiter //
+
+create procedure getAvgBuyPrice(in prodline varchar(50))
+begin
+select avg(buyprice)
+from products
+where productline = prodline;
+end //
+
+delimiter ;
+
+call getAvgBuyPrice('ships');
+
+drop procedure getAvgBuyPrice;
+
+delimiter //
+
+create procedure sample()
+begin
+declare a int default 1;
+select a;
+end //
+
+delimiter ;
+
+call sample();
+
+drop procedure sample;
+
+delimiter //
+
+create procedure sample()
+begin
+declare a int default 0;
+set a = 10;
+select a;
+set a = 20;
+select a;
+end //
+
+delimiter ;
+
+call sample();
+
+drop procedure sample;
+
+delimiter //
+
+create procedure sample1(empid int)
+begin
+declare fname varchar(20);
+declare lname varchar(20);
+select firstname, lastname
+into fname, lname
+from employees
+where employeenumber = empid;
+select fname, lname;
+end //
+
+delimiter ;
+
+call sample1(1102);
+
+delimiter //
+
+create procedure sample2(in num1 int, in num2 int, out sum int)
+begin
+set sum = num1 + num2;
+end //
+
+delimiter ;
+
+call sample2(18,42,@total);
+select @total;
+
+delimiter //
+
+create procedure sample3(num1 int, num2 int, 
+						out sum int, 
+						out prod int, out diff int)
+begin
+select sum;
+set sum = num1 + num2;
+select sum;
+set prod = num1 * num2;
+set diff = num1 - num2;
+end//
+
+delimiter ;
+
+set @total = 0;
+call sample3(18,3,@total,@mul,@sub);
+select @total, @mul, @sub;
+
+delimiter //
+
+create procedure sample4(num1 int, num2 int, 
+						inout sum int, 
+						out prod int, out diff int)
+begin
+select sum;
+set sum = num1 + num2;
+select sum;
+set prod = num1 * num2;
+set diff = num1 - num2;
+end//
+
+delimiter ;
+
+set @total = 10;
+call sample4(20,3,@total,@mul,@sub);
+select @total, @mul, @sub;
+
+#Write a stored procedure to get the city and state of the customer
+#based on the customer number provided.
+
+delimiter //
+
+create procedure getCityState(custid int, 
+							  out out_city varchar(40), 
+                              out out_state varchar(40))
+begin
+select city, state
+into out_city, out_state
+from customers
+where customernumber = custid;
+end//
+
+delimiter ;
+call getCityState(361, @c, @s);
+select @c 'Output City', @s 'Output State';
+
+delimiter //
+
+create procedure ifstatexp(num int)
+begin
+if num > 0 then
+	select 'positive' Result;
+end if;
+end//
+
+delimiter ;
+
+call ifstatexp(6);
+
+drop procedure ifstatexp;
+
+delimiter //
+
+create procedure ifelseexp(num int)
+begin
+if num > 0 then
+	select 'positive' Result;
+else
+	select 'negative' Result;
+end if;
+end//
+
+delimiter ;
+
+call ifelseexp(0);
+
+delimiter //
+
+create procedure ifelseifexp(num int)
+begin
+if num > 0 then
+	select 'positive' Result;
+elseif num < 0 then
+	select 'negative' Result;
+else 
+	select 'zero' Result;
+end if;
+end //
+
+delimiter ;
+
+call ifelseifexp(0);
+
+#Write a procedure the accept two parameters customer number as input
+#and customer level as output. The customer level depends upon 
+#the credit limit of the customer
+#if the credit limit of the customer is greater than 50000
+#then the customer level will be returned as platinum
+#for credit limit between 50000 and 10000, customer level will
+#be gold and for less than 10000, it will be silver
+
+delimiter //
+create procedure getCustomerLevel(custid int,
+								  out customerlevel varchar(20))
+begin
+declare creditlim double;
+select creditlimit 
+into creditlim
+from customers 
+where customernumber = custid;
+if creditlim > 50000 then
+	set customerlevel = 'platinum';
+elseif(creditlim <= 50000 and creditlim >= 10000) then
+	set customerlevel = 'gold';
+elseif creditlim < 10000 then
+	set customerlevel = 'silver';
+end if;
+end//
+
+delimiter ;
+
+call getCustomerlevel(471,@level);
+select @level;
+
+#Write a procedure to display the numbers from 1 to 5
+
+use sample;
+
+delimiter //
+
+ create procedure loop1(lastvalue int)
+ begin
+ declare i int;
+ declare str varchar(100);
+ 
+ set i = 1;
+ set str = '';
+ 
+ while i <= lastvalue do
+	set str = concat(str,i,',');
+    set i = i + 1;
+ end while;
+ 
+ select str;
+ end//
+
+delimiter ;
+
+call loop1(30);
+
+drop procedure loop1;
+
+delimiter //
+
+ create procedure loop2(lastvalue int)
+ begin
+ declare i int;
+ declare str varchar(100);
+ 
+ set i = 1;
+ set str = '';
+ 
+ repeat
+	set str = concat(str,i,',');
+    set i = i + 1;
+ until i > lastvalue
+ end repeat;
+ 
+ select str;
+ end//
+ 
+ delimiter ;
+ 
+ call loop2(15);

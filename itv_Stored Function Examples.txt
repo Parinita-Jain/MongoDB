@@ -1,0 +1,43 @@
+ delimiter //
+ 
+ create function getMessage(name varchar(20))
+ returns varchar(50)
+ deterministic
+ return concat('Hello ',name,' !');//
+
+delimiter ;
+
+select getMessage('king') 'Message';
+
+drop function getMessage;
+
+#Write a function to find the customer level based on the 
+#credit limit of the customer. The customer level should
+#be display along with the credit limit
+
+delimiter //
+
+create function customerlevel(creditlim double)
+returns varchar(10)
+deterministic
+begin
+declare customerlevel varchar(10);
+if creditlim > 50000 then
+	set customerlevel = 'platinum';
+elseif(creditlim <= 50000 and creditlim >= 10000) then
+	set customerlevel = 'gold';
+elseif creditlim < 10000 then
+	set customerlevel = 'silver';
+end if;
+return customerlevel;
+end//
+
+delimiter ;
+
+select customernumber, customername, creditlimit, 
+	   customerlevel(creditlimit) 'level'
+from customers;
+
+create table employee_names
+(empid int,
+empname varchar(50));

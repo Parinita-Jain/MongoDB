@@ -1,0 +1,299 @@
+Stored Procedure
+
+Database object that is used to wrap the SQL statement which we want to execute repeatedly
+
+Stored Procedure can take an input and can also return the output
+
+May contain conditional statements like if or case and also loop statements
+
+Benefits:
+1. reduce the network traffic: multiple sql statements are encapsulated in stored procedure. so when the procedure will be executed instead of sending multiple queries we can call the procedure only one
+
+2. easy to maintain: reusable.
+
+3. secure: we can give access to the stored procedure rather than giving the access to the tables on which the queries are based on
+
+In the case of ad hoc queries the mysql will compile the queries as and when we will give it for the execution but if we save the same queries as stored procedure. When we will call the stored procedure for the first time, mysql will compile all the queries inside the procedure and place the compiled queries in the cache memory so that next time thesee queries are not compiled again rather mysql will execute the compiled queries in the cache
+
+Syntax:
+
+1. Declare the stored procedure
+
+delimiter //
+
+create procedure procedure_name(parameters)
+begin
+statements to be executed when the stored procedure is called
+end //
+
+delimiter ;
+
+2. call the stored procedure
+
+call procedure_name(arguments);
+
+Stored Procedure Parameters
+
+1. IN - default. These parameter will get the value when the stored procedure is called. These parameter are usable only within the stored procedure and not outside the stored procedure
+
+2. OUT - This parameter will be used to send out the value from the stored procedure
+
+3. INOUT - Is the blend of IN and OUT parameter. The caller can pass the input value to the parameter and the stored can change this value and return the new value back to the caller
+
+Declaring variable inside the stored procedure
+
+Syntax:
+declare variable_name datatype(size) default default_value;
+
+delimiter //
+
+create procedure sample()
+begin
+declare a int default 0;
+select a;
+end //
+
+select statement inside the stored procedure can also be used to display some message, some parameter or variable value
+
+Assign the value to variable
+
+Syntax:
+
+set variable_name = value
+
+delimiter //
+
+create procedure sample()
+begin
+declare a int default 0;
+set a = 10;
+select a;
+set a = 20
+select a;
+end //
+
+To assign the value of the variable from the database table column we can do it using into clause
+
+declare n varchar(20);
+select name 
+into n
+from student
+where id = 10;
+
+If Statement
+
+Syntax:
+
+if expression then
+	statements;
+end if;
+
+
+expression ===> should evalute to true, false or null
+
+If else statement
+
+Syntax:
+
+if expression then
+	statements;
+else
+	else-statements;
+end if;
+
+If else if statement
+
+Syntax:
+
+if expression then
+	statements;
+elseif expression then 
+	statements;
+elseif expression then
+	
+	.....
+	
+	.....
+else 
+	else-statements;
+end if;
+
+MySQL Loops
+
+MySQL provides the loop statements to execute a block of SQL statements repeatedly based on the condition. 
+
+There are 3 loop statement in MySQL:
+1. while
+2. repeat
+3. loop ==>later using cursor
+
+While Loop
+
+Syntax:
+
+while expression do
+	statements to be repeated;
+end while;	
+
+expression ==> condition or a statement that returns boolean value 
+
+In the while loop the expression is evaluted before the loop statement, hence it is also known as pre-test loop.
+
+Repeat Loop
+
+Syntax:
+
+repeat
+	statements to be repeated;
+until expression
+end repeat;
+
+Here the loop will be repeated if the expression evalutes to FALSE.
+
+Since in the repeat the expression is evaluted after the execution of the statements it is also known as post-test loop.
+
+Loop Statement
+
+Syntax:
+
+loop
+	statements to be repeated;
+end loop;
+
+In this loop there is no condition checked for executing the loop statements. The loop will be by default an infinite loop
+
+---------------------------------------
+Stored Functions
+
+Builtin Functions
+
+-single row function
+--string function (left, right, substr)
+--date (sysdate, curdate, now, datadiff, dateformat,...)
+--math (round, truncate, mod, pow,...)
+--condition (ifnull,...)
+
+-multiple row function > group function
+min, max, sum, count, avg, ...
+
+We can create our functions also. Stored functions are special type of stored procedures
+
+Difference Procedure and Functions
+
+	stored procedure				stored function
+1.	return more then one value		will also return only one value
+	or may not return any value
+	
+2. 	procedure is called using 		function is called using
+	call statement					select statement
+	eg. call proc();				eg. select func();
+	
+Syntax:
+
+create function function_name(parameter1, parameter2, ...)
+returns datatype
+[not] deterministic
+statements;
+return value
+
+returns statement defines the datatype of the value that will be returned by the function
+
+return statement will specify the actual value to be returned
+
+In the function body if there is only one statement i.e. return statement then we can skip the begin and end statement
+
+------------------------------------------
+Cursors
+
+Cursors are supported inside stored procedure and function
+
+Cursor is temporary memory or temporary work station. Cursor is allocated memory by the database server when we perform any type of DML(insert, update, delete) operation. Cursor is used to store the database table in the temporary memory(RAM memory)
+
+There 2 types of Cursors:
+1. Implicit Cursor - Are created by the database server while performing the DML operations on the database table
+2. Explicit Cursor - Are created by the programmers by declaring them in the procedure or function
+
+Cursors are mostly used for row-to-row process.
+
+Explicit cursor have the 3 features:
+1. Read Only - you cannot update the table
+2. Asensitive - not repetation of the records, will mostly give genuine records
+3. One directional/Unidirectional - you can retrieve the data from the table on one direction eg. top to bottom
+
+Asensitive - not repetation of the records, will mostly give genuine records
+
+Insensitive - duplicates of the same records because of which multiple copies of the same records exists which can lead to inconsistant data
+
+To use cursor within the procedure/function/trigger we will have to following steps:
+
+1. declare the cursor using declare cursor statement
+
+declare cursor_name cursor for select statement
+
+declare cur cursor for select * from employees;
+
+Here, a cursor named cur will be declared that will perform row-by-row reading of the data that will be the result of the select statement
+
+2. open cursor_name
+
+open cur
+
+This is open the server connection and get the data from the database into the cursor memory
+
+3. fetch cursor_name into variable1, variable2
+
+fetch cur into var1, var2, .....
+
+This statement will be repeated for each row to get the values of the database table in the variable and then we can perform some operation on the value of these variable
+
+fetch will fetch the next row from the cursor memory. Everytime the fetch statement is executed the next row will be fetched. If there are no rows remaining to be fetched this statement will procedure an error: No data - zero rows fetched
+
+4. close cursor_name
+
+close cur
+
+Close the cursor means, remove the database table from the temporary memory
+
+---------------------------------------------------
+Triggers
+
+Trigger are special type of the stored procedure. It is special because it is not called direclty like a stored procedure. The main difference between procedure and trigger is that a trigger is called automatically when a data is modified in a table using DML queries whereas a stored procedure must be called explicitly
+
+Trigger is executed or fired whenever a DML event occurs on the table.
+
+DML ==> insert, update, delete
+
+Trigger can also be defined whether the trigger should to executed before the DML operation or after the DML operation
+
+We can create 6 types of trigger on a single table:
+1. before insert
+2. after insert
+3. before update
+4. after update
+5. before delete
+6. after delete
+
+Trigger will invoked or called only if the above events will occur on the table. If no such event occurs, no trigger will be invoked
+
+Mostly for naming the trigger we will follow the following syntax:
+
+before|after_tablename_insert|update|delete
+
+eg before_student_insert, after_student_insert, before_student_delete
+
+Syntax:
+
+create trigger trigger_name trigger_time trigger_event
+on table_name
+for each row
+begin
+------
+end;
+
+
+trigger_time ==> before or after
+trigger_event ==> insert, update or delete
+
+ 
+
+

@@ -1,0 +1,159 @@
+Start MongoDB Server
+
+mongod --dbpath="D:\SQL-Weekday-8-10\data" --logpath="D:\SQL-Weekday-8-10\log\mongo.log"
+
+Start MongoDB Shell
+
+mongosh
+
+View All the Databases
+
+show dbs
+
+Create new database or select an existing database
+
+use <database>
+use sample
+
+View All Collections in the database
+
+show collections
+
+Insert Single Document in the collection
+
+db.<collectionname>.insertOne(<single_document>);
+
+{} ==> indicates the single documents
+[] ==> indicates array of the documents
+
+db.users.insertOne({
+	name:"ekwinder",
+	age: 30
+})
+
+db.users.insertOne({
+	name:"rahul",
+	age: 32
+})
+
+db.users.insertOne({
+	_id: 274,
+	name:"leena",
+	age: 29
+})
+
+db.users.insertOne({
+	name:"riya",
+	email:"riya@gmail.com"
+})
+
+View All the documents of the collection
+
+==> select * from users;
+
+db.users.find()
+
+Insert Multiple documents in the collection
+
+db.users.insertMany([
+	{name: "alia", age:25},
+	{name: "meena", email:"meena@gmail.com"},
+	{name: "neha", age:30}
+])
+
+View First / Single Document
+
+db.users.findOne()
+
+==> select * from users where name='neha';
+
+db.users.findOne({
+	name:"Ekwinder"
+})
+
+db.users.find({
+	name:"neha"
+})
+
+==> select * from users where age=30;
+
+db.users.findOne({
+	age:30
+})
+
+db.users.find({
+	age:30
+})
+
+Create the collection 
+
+db.createCollection("users")
+
+Drop the collection
+
+db.users.drop()
+
+Update Single Document
+
+update users set age = 21 where name = 'harry';
+
+db.users.updateOne(
+	{	
+		name: 'harry'
+	},
+	{
+		$set: {
+			age: 22,
+			email: 'harry@gmail.com'
+		}
+	}
+)
+
+db.users.updateOne(
+	{
+		age: 35
+	},
+	{
+		$set: {
+			salary: 20000
+		}
+	}
+)
+
+Update Multiple Document
+
+db.users.updateMany(
+	{
+		age: 35
+	},
+	{
+		$set: {
+			salary: 30000
+		}
+	}
+)
+
+db.users.updateMany(
+	{},
+	{
+		$set: {
+			phone: 8888888888
+		}
+	}
+)
+
+Delete Single Document
+
+db.users.deleteOne(
+	{ name: 'harry'}
+)
+
+Delete Multiple Document
+
+db.users.deleteMany(
+	{age:35}
+)
+
+delete from users; ==> delete all the rows from the table
+
+db.users.deleteMany({})
